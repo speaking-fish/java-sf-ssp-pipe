@@ -3,6 +3,7 @@ package com.speakingfish.protocol.ssp.process;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -48,6 +49,12 @@ public class SimpleProcessFacade implements CommandFacade {
         try {
             command.writeTo(outputCommandStream);
             writeFrame(destOutputStream(), 0, outputCommandStream.size(), outputCommandStream.toByteArray());
+            try {
+                destOutputStream().flush();
+            } catch(IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             
             /*
             if(_flagOutStd) {

@@ -1,4 +1,4 @@
-package com.speakingfish.protocol.sfp.process;
+package com.speakingfish.protocol.ssp.process;
 
 import com.speakingfish.pipe.StreamGobbler;
 import com.speakingfish.protocol.ssp.Any;
