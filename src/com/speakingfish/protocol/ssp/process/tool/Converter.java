@@ -30,6 +30,14 @@ import static com.speakingfish.protocol.ssp.yaml.Helper.*;
 
 public class Converter {
     
+    public static void usage() {
+        System.out.println(""
+            + "\nUsage: Converter -i input-file -o output-file"
+            + "\nSupported file extensions: xml, yaml, ssp, sspf"
+            + "\n"
+            );
+    }
+    
     public static void main(String[] args) {
         String inputFileName = null;
         String outputFileName = null;
@@ -41,7 +49,21 @@ public class Converter {
             } else if("-o".equals(param)) {
                 ++i;
                 outputFileName = args[i];
+            } else if("-h".equals(param)) {
+                usage();
+                return;
+                
+            } else {
+                throw new IllegalArgumentException("Unknown parameter: " + param);
             }
+        }
+        if(false
+            || (null == inputFileName)
+            || (null == outputFileName)
+        ) {
+            usage();
+            return;
+            
         }
         convert(
             inputFileName,
