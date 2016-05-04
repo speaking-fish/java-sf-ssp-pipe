@@ -6,6 +6,7 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -152,38 +153,35 @@ public class Converter {
         }
     }
     */
-
-    public static void convert(
-        final String  inputFileName ,
-        final String  outputFileName,
-        final boolean outputAppend
-    ) {
+    
+    public static Any<?> read(final String  inputFileName) {
         final String inputFileNameExt  = inputFileName .substring(inputFileName .lastIndexOf('.') + 1);
-        Any<?> input = null;
         if(Boolean.FALSE) {
+            return null;
         } else if("xml".equalsIgnoreCase(inputFileNameExt)) {
-            input = xmlFileToAny(inputFileName);
+            return xmlFileToAny(inputFileName);
         } else if("yaml".equalsIgnoreCase(inputFileNameExt)) {
-            input = readYaml(new File(inputFileName));
+            return readYaml(new File(inputFileName));
         } else if("ssp".equalsIgnoreCase(inputFileNameExt)) {
             try {
-                input = readAny(readAll(new File(inputFileName)));
-            } catch(EOFException e) {
-                throw new WrappedEOFException(e);
-            }
-        } else if("sspf".equalsIgnoreCase(inputFileNameExt)) {
-            try {
-                input = readAny(readFrame(new ByteArrayInputStream(readAll(new File(inputFileName)))));
+                return readAny(readAll(new File(inputFileName)));
             } catch(EOFException e) {
                 throw new WrappedEOFException(e);
             }
         } else {
             throw new IllegalArgumentException("Unsupported format: " + inputFileNameExt);
         }
+    }
+
+    public static void write(
+        final Any<?>  input,
+        final String  outputFileName,
+        final boolean outputAppend
+    ) {
         final String outputFileNameExt = outputFileName.substring(outputFileName.lastIndexOf('.') + 1);
         if(Boolean.FALSE) {
         } else if("xml".equalsIgnoreCase(outputFileNameExt)) {
-            anyToXmlFile(input, outputFileName);
+            anyToXmlFile(input, outputFileName, outputAppend);
         } else if("yaml".equalsIgnoreCase(outputFileNameExt)) {
             final Node srcAnyToNode = newNode(input);
             //Representer ee = new Representer();
@@ -200,7 +198,7 @@ public class Converter {
             
             FileWriter sw;
             try {
-                sw = new FileWriter(outputFileName);
+                sw = new FileWriter(outputFileName, outputAppend);
             } catch(IOException e) {
                 throw new WrappedIOException(e);
             }
@@ -225,6 +223,32 @@ public class Converter {
             }
         } else {
             throw new IllegalArgumentException("Unsupported format: " + outputFileNameExt);
+        }
+    }
+    
+    public static void convert(
+        final String  inputFileName ,
+        final String  outputFileName,
+              boolean outputAppend
+    ) {
+        final String inputFileNameExt  = inputFileName .substring(inputFileName .lastIndexOf('.') + 1);
+        if("sspf".equalsIgnoreCase(inputFileNameExt)) {
+            try {
+                final InputStream inputStream = new ByteArrayInputStream(readAll(new File(inputFileName)));
+                while(true) {
+                    final byte[] frame = readFrame(inputStream);
+                    if(0 < frame.length) {
+                        final Any<?> input = readAny(frame);
+                        write(input, outputFileName, outputAppend);
+                        outputAppend = true;
+                    }
+                }
+            } catch(EOFException e) {
+                throw new WrappedEOFException(e);
+            }
+        } else {
+            final Any<?> input = read(inputFileName);
+            write(input, outputFileName, outputAppend);
         }
     }
     
