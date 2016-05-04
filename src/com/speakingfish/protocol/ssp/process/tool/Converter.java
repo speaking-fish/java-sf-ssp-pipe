@@ -234,7 +234,7 @@ public class Converter {
               boolean      outputAppend
     ) {
         final String outputFileNameExt = outputFileName.substring(outputFileName.lastIndexOf('.') + 1);
-        if(Boolean.FALSE) {
+        if(inputFileNames.size() <= 1) {
         } else if("xml".equalsIgnoreCase(outputFileNameExt)) {
             if(0 < inputFileNames.size() || outputAppend) {
                 throw new IllegalArgumentException("Can't concatenate to xml.");
