@@ -34,7 +34,7 @@ public class SimpleProcessFacade implements CommandFacade {
         this(process, process.getOutputStream(), process.getInputStream());
     }
 
-    public Any<?> apply(Any<?> command) {
+    public synchronized Any<?> apply(Any<?> command) {
         /*
         var frameStream        : TMemoryStream;
         var outputCommandStream: TMemoryStream;
